@@ -22,8 +22,7 @@
 #    but doing so is not required as the rescale_image() function will attempt to rescale
 #    the background image anyway.
 #   Fonts used: SitkaDisplay-Bold.ttf, SitkaDisplay-Italic.ttf, SitkaDisplay-BoldItalic.ttf
-#    Fonts must be extracted from the TTC files in Windows 8, 8.1, 10, and 11 using FontForge
-#    OR they're available on the First Fruits shared folder on Google Drive under Tech Resources.
+#
 # - Run thumb_gen.py <filename of background image>
 #   Note - The image path will be prompted for if it is omitted from the command line arg.
 #    Additionally, the image will be checked for existence and validity before proceeding
@@ -40,8 +39,6 @@
 
 from PIL import Image, ImageDraw, ImageFont, ImageFilter, ImageChops
 from datetime import datetime
-import sys
-from pathlib import Path
 
 ########## GROUP NAME & TODAY'S DATE ############
 NAME = {
@@ -188,7 +185,7 @@ def draw_text(img, text, dic):
     font = ImageFont.truetype(dic["font"], dic["size"])
 
     # Create piece of canvas to draw text on and blur
-    blurred = Image.new('RGBA', bg.size)
+    blurred = Image.new('RGBA', img.size)
     draw = ImageDraw.Draw(blurred)
     draw.text(xy=(x+dic["blur_offs"],y+dic["blur_offs"]), text=text, fill='black', font=font, anchor='mm')
     blurred = blurred.filter(ImageFilter.BoxBlur(dic["blur"]))
@@ -201,63 +198,3 @@ def draw_text(img, text, dic):
     draw.text(xy=(x,y), text=text, fill=dic["color"], font=font, anchor='mm', stroke_width=dic["stroke"], stroke_fill=dic["stroke_color"])
 
     return img
-
-
-####### START OF THE MAIN THREAD ###########################################
-fn = ""
-bg = ""
-if len(sys.argv) == 2:
-    print(f"Opening {sys.argv[1]}...")
-    fn = sys.argv[1]
-    path = Path(fn)
-
-while (True):    
-    while (not path.is_file()):
-        fn = input("Enter filename of image: ")
-        path = Path(fn)
-    
-    # Open background image and work out centre
-    try:
-        bg = Image.open(fn).convert('RGB')
-        bg.verify()
-        print("Background image loaded!")
-        break #Exit infinite loop when image is validated!
-    except Exception:
-        print("Invalid image")
-        fn = ""
-        path = Path(fn)
-        continue
-    
-    
-now = datetime.now()
-fDate = now.strftime("%B %d, %Y")
-
-passage = input("Enter today's passage: ")
-is_2_line = input("Will your title need 2 lines? (Y/N): ")
-
-if is_2_line == "Y" or is_2_line == "y":
-    title = input("Enter the first line of the title: ")
-    title2 = input("Enter the second line of the title: ")
-else:
-    title = input("Enter the title: ")
-    title2 = ""
-
-is_today = input(f"Is this thumbnail for today on {fDate}? (Y/N): ")
-if is_today == "N" or is_today == "n":
-    fDate = input("Enter today's date as 'Month DD, YYYY': ")
-    
-thumb = rescale_image(bg)
-
-thumb = draw_text(thumb, "First Fruits", NAME)
-
-if is_2_line:
-    thumb = draw_text(thumb, passage, PASSAGE3)
-    thumb = draw_text(thumb, title, TITLE3_1)
-    thumb = draw_text(thumb, title2, TITLE3_2)
-else:
-    thumb = draw_text(thumb, passage, PASSAGE2)
-    thumb = draw_text(thumb, title, TITLE2_1)
-
-thumb = draw_text(thumb, fDate, DATE)
-
-thumb.save('thumbnail.png')
