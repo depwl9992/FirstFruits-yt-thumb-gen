@@ -55,7 +55,7 @@ NAME = {
 DATE = {
     "font":"SitkaDisplay-Italic.ttf",
     "size":73,
-    "top":512,
+    "top":550,
     "blur":12,
     "blur_offs":6,
     "color":"#2f2f2f",
