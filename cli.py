@@ -4,11 +4,12 @@ from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont, ImageFilter, ImageChops
 from datetime import datetime
 import thumb_gen
+import os
 
 ####### START OF THE MAIN THREAD ###########################################
 fn = ""
 bg = ""
-#path=Path(fn)
+path=Path(fn)
 if len(sys.argv) == 2:
     print(f"Opening {sys.argv[1]}...")
     fn = sys.argv[1]
@@ -33,7 +34,7 @@ while (True):
     
     
 now = datetime.now()
-fDate = now.strftime("%B %d, %Y")
+fDate = now.strftime("%Y-%m-%d") # Initial input date. We'll reformat for text and filename later.
 
 passage = input("Enter today's passage: ")
 is_2_line = input("Will your title need 2 lines? (Y/N): ")
@@ -47,7 +48,17 @@ else:
 
 is_today = input(f"Is this thumbnail for today on {fDate}? (Y/N): ")
 if is_today == "N" or is_today == "n":
-    fDate = input("Enter today's date as 'YYYY-MM-DD': ") # Get parseable user-entered date and preserve for backlog of thumbnails plus filenaming.
+    while (True):
+        fDate = input("Enter today's date as 'YYYY-MM-DD': ") # Get parseable user-entered date and preserve for backlog of thumbnails plus filenaming.
+        try:
+            thumb_date = datetime.strptime(fDate, "%Y-%m-%d").date()
+            break
+        except Exception:
+            print("Incorrect date format!")
+            continue
+            
+    fDate = thumb_date.strftime("%B %d, %Y")
+else:
     thumb_date = datetime.strptime(fDate, "%Y-%m-%d").date()
     fDate = thumb_date.strftime("%B %d, %Y")
     
@@ -65,10 +76,14 @@ else:
 
 thumb = thumb_gen.draw_text(thumb, fDate, thumb_gen.DATE)
 
-fnDate = thumb_date.strftime("%Y-%m-%d.png")
+isExist = os.path.exists("output/")
+if not isExist:
+    os.makedirs("output/")
+    
+fnDate = thumb_date.strftime("output/%Y-%m-%d.png")
 
 if fn == fnDate:
-    fnDateBak = thumb_date.strftime("%Y-%m-%d_bak.png")
+    fnDateBak = thumb_date.strftime("output/%Y-%m-%d_bak.png")
     bg.save(fnDateBak)
     
 thumb.save(fnDate)
