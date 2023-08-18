@@ -39,7 +39,7 @@
 
 from PIL import Image, ImageDraw, ImageFont, ImageFilter, ImageChops
 from datetime import datetime
-
+import os
 ########## GROUP NAME & TODAY'S DATE ############
 NAME = {
     "font":"SitkaDisplay-Bold.ttf",
@@ -182,7 +182,18 @@ def draw_text(img, text, dic):
     y = dic["top"] + (dic["size"]//2)
 
     # Create font
-    font = ImageFont.truetype(dic["font"], dic["size"])
+    while (True):
+        if not os.path.isfile("fonts/" + dic["font"]):
+            print(f"Cannot find font 'fonts/" + dic["font"])
+            input("Please load the font into the fonts folder and press any key to continue\nOr Ctrl-C to quit")
+        
+        try:
+            font = ImageFont.truetype("fonts/" + dic["font"], dic["size"])
+            break
+        except Exception:
+            continue
+                
+    
 
     # Create piece of canvas to draw text on and blur
     blurred = Image.new('RGBA', img.size)
