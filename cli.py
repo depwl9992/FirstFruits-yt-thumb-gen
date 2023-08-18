@@ -48,8 +48,15 @@ else:
 
 is_today = input(f"Is this thumbnail for today on {fDate}? (Y/N): ")
 if is_today == "N" or is_today == "n":
-    fDate = input("Enter today's date as 'YYYY-MM-DD': ") # Get parseable user-entered date and preserve for backlog of thumbnails plus filenaming.
-    thumb_date = datetime.strptime(fDate, "%Y-%m-%d").date()
+    while (True):
+        fDate = input("Enter today's date as 'YYYY-MM-DD': ") # Get parseable user-entered date and preserve for backlog of thumbnails plus filenaming.
+        try:
+            thumb_date = datetime.strptime(fDate, "%Y-%m-%d").date()
+            break
+        except Exception:
+            print("Incorrect date format!")
+            continue
+            
     fDate = thumb_date.strftime("%B %d, %Y")
 else:
     thumb_date = datetime.strptime(fDate, "%Y-%m-%d").date()
