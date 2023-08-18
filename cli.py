@@ -4,11 +4,12 @@ from pathlib import Path
 from PIL import Image, ImageDraw, ImageFont, ImageFilter, ImageChops
 from datetime import datetime
 import thumb_gen
+import os
 
 ####### START OF THE MAIN THREAD ###########################################
 fn = ""
 bg = ""
-#path=Path(fn)
+path=Path(fn)
 if len(sys.argv) == 2:
     print(f"Opening {sys.argv[1]}...")
     fn = sys.argv[1]
@@ -68,6 +69,10 @@ else:
 
 thumb = thumb_gen.draw_text(thumb, fDate, thumb_gen.DATE)
 
+isExist = os.path.exists("output/")
+if not isExist:
+    os.makedirs("output/")
+    
 fnDate = thumb_date.strftime("output/%Y-%m-%d.png")
 
 if fn == fnDate:
